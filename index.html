@@ -19,6 +19,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            padding-bottom: 60px; /* Footer 공간 확보 */
         }
 
         .container {
@@ -406,6 +407,34 @@
             background: #F57C00;
         }
 
+        /* Footer 스타일 */
+        #game-footer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            z-index: 1000;
+        }
+
+        @media (max-height: 600px) {
+            #game-footer {
+                bottom: 5px;
+                padding: 8px 12px;
+                gap: 8px;
+            }
+            #game-footer span,
+            #game-footer a {
+                font-size: 12px !important;
+            }
+        }
+
         @media (max-width: 480px) {
             .question, .answer {
                 font-size: 36px;
@@ -535,6 +564,16 @@
                 <button class="game-control-btn pause-game-btn" onclick="pauseBasketGame()">일시정지</button>
             </div>
         </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="game-footer">
+        <span style="color: rgba(255,255,255,0.8); font-size: 14px;">Made by SunnyBear</span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 14px;">|</span>
+        <a href="https://wonusdwant.tistory.com" target="_blank" 
+           style="color: rgba(102, 126, 234, 0.9); text-decoration: none; font-size: 14px;">
+           wonusdwant.tistory.com
+        </a>
     </div>
 
     <script>
