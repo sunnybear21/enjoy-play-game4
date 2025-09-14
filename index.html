@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>구구단 학습 게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .game-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .game-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #667eea;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .game-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 플래시카드 게임 스타일 */
+        .flashcard-game {
+            display: block;
+        }
+
+        .basket-game {
+            display: none;
+        }
+
+        .game-section.hidden {
+            display: none;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #667eea;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .flashcard {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .flashcard:hover {
+            transform: scale(1.02);
+        }
+
+        .question {
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .answer {
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+            display: none;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .answer.show {
+            display: block;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .prev-btn {
+            background: #FF9800;
+            color: white;
+        }
+
+        .prev-btn:hover {
+            background: #F57C00;
+            transform: translateY(-2px);
+        }
+
+        .next-btn {
+            background: #2196F3;
+            color: white;
+        }
+
+        .next-btn:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .progress {
+            text-align: center;
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .dan-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .dan-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .dan-checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .dan-checkbox label {
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .select-all-btn {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #9C27B0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .timer-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 10px;
+        }
+
+        .timer-control label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .timer-control select {
+            padding: 8px 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background: white;
+        }
+
+        .timer-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .timer-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            width: 0%;
+            transition: none;
+        }
+
+        .reset-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .reset-btn {
+            padding: 8px 12px;
+            background: #FF5722;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #E64A19;
+        }
+
+        /* 바구니 게임 스타일 */
+        .game-canvas {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(180deg, #87CEEB 0%, #98D8E8 100%);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            cursor: none;
+        }
+
+        .basket {
+            width: 80px;
+            height: 60px;
+            background: #8B4513;
+            border-radius: 10px 10px 40px 40px;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 3px solid #654321;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            transition: none; /* 부드러운 움직임을 위해 transition 제거 */
+        }
+
+        .bubble {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at 30% 30%, #FFE4B5, #FFA500);
+            border-radius: 50%;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: #333;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        .game-question {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #FFE4B5;
+            border-radius: 10px;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .game-control-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .start-game-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .start-game-btn:hover {
+            background: #45a049;
+        }
+
+        .pause-game-btn {
+            background: #FF9800;
+            color: white;
+        }
+
+        .pause-game-btn:hover {
+            background: #F57C00;
+        }
+
+        @media (max-width: 480px) {
+            .question, .answer {
+                font-size: 36px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .game-question {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 구구단 학습 게임 🌟</h1>
+        
+        <div class="game-selector">
+            <button class="game-btn active" onclick="selectGame('flashcard')">플래시카드</button>
+            <button class="game-btn" onclick="selectGame('basket')">바구니 게임</button>
+        </div>
+
+        <!-- 플래시카드 게임 -->
+        <div class="game-section flashcard-game" id="flashcardGame">
+            <div class="mode-selector">
+                <button class="mode-btn active" id="seqBtn">순서대로</button>
+                <button class="mode-btn" id="rndBtn">랜덤</button>
+            </div>
+
+            <div class="dan-selector">
+                <div class="dan-checkbox">
+                    <input type="checkbox" id="dan2" checked>
+                    <label for="dan2">2단</label>
+                </div>
+                <div class="dan-checkbox">
+                    <input type="checkbox" id="dan3" checked>
+                    <label for="dan3">3단</label>
+                </div>
+                <div class="dan-checkbox">
+                    <input type="checkbox" id="dan4" checked>
+                    <label for="dan4">4단</label>
+                </div>
+                <div class="dan-checkbox">
+                    <input type="checkbox" id="dan5" checked>
+                    <label for="dan5">5단</label>
+                </div>
+                <div class="dan-checkbox">
+                    <input type="checkbox" id="dan6" checked>
+                    <label for="dan6">6단</label>
+                </div>
+                <div class="dan-checkbox">
+                    <input type="checkbox" id="dan7" checked>
+                    <label for="dan7">7단</label>
+                </div>
+                <div class="dan-checkbox">
+                    <input type="checkbox" id="dan8" checked>
+                    <label for="dan8">8단</label>
+                </div>
+                <div class="dan-checkbox">
+                    <input type="checkbox" id="dan9" checked>
+                    <label for="dan9">9단</label>
+                </div>
+            </div>
+            
+            <button class="select-all-btn" id="selectAllBtn">전체 선택/해제</button>
+
+            <div class="reset-section" id="resetSection"></div>
+
+            <div class="timer-control">
+                <label for="timer">자동 답 표시 시간:</label>
+                <select id="timer">
+                    <option value="0">수동 (클릭)</option>
+                    <option value="2">2초</option>
+                    <option value="3" selected>3초</option>
+                    <option value="4">4초</option>
+                    <option value="5">5초</option>
+                    <option value="7">7초</option>
+                    <option value="10">10초</option>
+                </select>
+            </div>
+
+            <div class="progress" id="progress">2단 - 1번 문제</div>
+            
+            <div class="timer-bar">
+                <div class="timer-progress" id="timerProgress"></div>
+            </div>
+            
+            <div class="flashcard" id="flashcard">
+                <div class="question" id="question">2 × 1 = ?</div>
+                <div class="answer" id="answer">2</div>
+                <div class="hint" id="hint">카드를 클릭하면 답이 보여요!</div>
+            </div>
+            
+            <div class="controls">
+                <button class="control-btn prev-btn" id="prevBtn">◀ 이전 문제</button>
+                <button class="control-btn next-btn" id="nextBtn">다음 문제 ▶</button>
+            </div>
+        </div>
+
+        <!-- 바구니 게임 -->
+        <div class="game-section basket-game" id="basketGame">
+            <div class="game-question" id="gameQuestion">게임을 시작하세요!</div>
+            
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-label">점수</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">맞춘 문제</div>
+                    <div class="stat-value" id="correct">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">생명</div>
+                    <div class="stat-value" id="lives">3</div>
+                </div>
+            </div>
+
+            <div class="game-canvas" id="gameCanvas">
+                <div class="basket" id="basket"></div>
+            </div>
+
+            <div class="game-controls">
+                <button class="game-control-btn start-game-btn" onclick="startBasketGame()">게임 시작</button>
+                <button class="game-control-btn pause-game-btn" onclick="pauseBasketGame()">일시정지</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 플래시카드 게임 변수
+        let mode = 'sequential';
+        let problems = [];
+        let currentIndex = 0;
+        let allSelected = true;
+        let autoTimer = null;
+        let timerDuration = 3;
+
+        // 바구니 게임 변수
+        let basketGame = {
+            running: false,
+            paused: false,
+            score: 0,
+            correct: 0,
+            lives: 3,
+            currentAnswer: 0,
+            bubbles: [],
+            basketX: 250,
+            animationId: null
+        };
+
+        // 게임 선택
+        function selectGame(game) {
+            document.querySelectorAll('.game-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (game === 'flashcard') {
+                document.querySelector('.game-btn:nth-child(1)').classList.add('active');
+                document.getElementById('flashcardGame').style.display = 'block';
+                document.getElementById('basketGame').style.display = 'none';
+                stopBasketGame();
+            } else {
+                document.querySelector('.game-btn:nth-child(2)').classList.add('active');
+                document.getElementById('flashcardGame').style.display = 'none';
+                document.getElementById('basketGame').style.display = 'block';
+                stopAllTimers();
+            }
+        }
+
+        // DOM 로드 완료 후 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            initFlashcardGame();
+            initBasketGame();
+        });
+
+        // 플래시카드 게임 초기화
+        function initFlashcardGame() {
+            // 이벤트 리스너 설정
+            document.getElementById('seqBtn').addEventListener('click', () => setMode('sequential'));
+            document.getElementById('rndBtn').addEventListener('click', () => setMode('random'));
+            document.getElementById('prevBtn').addEventListener('click', prevQuestion);
+            document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+            document.getElementById('selectAllBtn').addEventListener('click', toggleSelectAll);
+            document.getElementById('flashcard').addEventListener('click', showAnswer);
+            document.getElementById('timer').addEventListener('change', updateTimerSetting);
+
+            // 체크박스 이벤트 리스너
+            for (let i = 2; i <= 9; i++) {
+                let checkbox = document.getElementById(`dan${i}`);
+                if (checkbox) {
+                    checkbox.addEventListener('change', function(e) {
+                        const selectedCount = getSelectedDans().length;
+                        if (selectedCount === 0) {
+                            e.target.checked = true;
+                            alert('최소 하나의 단은 선택되어 있어야 합니다!');
+                            return;
+                        }
+                        generateProblems();
+                        updateResetButtons();
+                    });
+                }
+            }
+
+            timerDuration = parseInt(document.getElementById('timer').value);
+            generateProblems();
+            updateResetButtons();
+        }
+
+        function getSelectedDans() {
+            const selected = [];
+            for (let i = 2; i <= 9; i++) {
+                let checkbox = document.getElementById(`dan${i}`);
+                if (checkbox && checkbox.checked) {
+                    selected.push(i);
+                }
+            }
+            return selected;
+        }
+
+        function updateResetButtons() {
+            const resetSection = document.getElementById('resetSection');
+            if (!resetSection) return;
+            
+            const selectedDans = getSelectedDans();
+            resetSection.innerHTML = '';
+            
+            selectedDans.forEach(dan => {
+                const btn = document.createElement('button');
+                btn.className = 'reset-btn';
+                btn.textContent = `${dan}단 처음부터`;
+                btn.onclick = () => resetSingleDan(dan);
+                resetSection.appendChild(btn);
+            });
+            
+            if (selectedDans.length > 1) {
+                const allBtn = document.createElement('button');
+                allBtn.className = 'reset-btn';
+                allBtn.textContent = '전체 처음부터';
+                allBtn.onclick = () => resetAllDans();
+                resetSection.appendChild(allBtn);
+            }
+        }
+
+        function resetSingleDan(dan) {
+            for (let i = 2; i <= 9; i++) {
+                let checkbox = document.getElementById(`dan${i}`);
+                if (checkbox) {
+                    checkbox.checked = (i === dan);
+                }
+            }
+            
+            mode = 'sequential';
+            document.getElementById('seqBtn').classList.add('active');
+            document.getElementById('rndBtn').classList.remove('active');
+            
+            generateProblems();
+            updateResetButtons();
+        }
+
+        function resetAllDans() {
+            currentIndex = 0;
+            if (mode === 'random') {
+                generateProblems();
+            } else {
+                showQuestion();
+            }
+        }
+
+        function generateProblems() {
+            problems = [];
+            const selectedDans = getSelectedDans();
+            
+            if (selectedDans.length === 0) {
+                document.getElementById('dan2').checked = true;
+                return generateProblems();
+            }
+            
+            if (mode === 'sequential') {
+                for (let dan of selectedDans) {
+                    for (let num = 1; num <= 9; num++) {
+                        problems.push({dan: dan, num: num});
+                    }
+                }
+            } else {
+                for (let dan of selectedDans) {
+                    for (let num = 1; num <= 9; num++) {
+                        problems.push({dan: dan, num: num});
+                    }
+                }
+                for (let i = problems.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [problems[i], problems[j]] = [problems[j], problems[i]];
+                }
+            }
+            
+            currentIndex = 0;
+            showQuestion();
+        }
+
+        function setMode(newMode) {
+            mode = newMode;
+            document.getElementById('seqBtn').classList.toggle('active', newMode === 'sequential');
+            document.getElementById('rndBtn').classList.toggle('active', newMode === 'random');
+            generateProblems();
+        }
+
+        function updateTimerSetting() {
+            timerDuration = parseInt(document.getElementById('timer').value);
+            stopAllTimers();
+            
+            if (!document.getElementById('answer').classList.contains('show') && timerDuration > 0) {
+                startAutoTimer();
+            }
+        }
+
+        function stopAllTimers() {
+            if (autoTimer) {
+                clearTimeout(autoTimer);
+                autoTimer = null;
+            }
+        }
+
+        function startAutoTimer() {
+            if (timerDuration === 0) return;
+            
+            stopAllTimers();
+            
+            let startTime = Date.now();
+            let timerProgress = document.getElementById('timerProgress');
+            
+            function updateProgress() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min((elapsed / (timerDuration * 1000)) * 100, 100);
+                if (timerProgress) {
+                    timerProgress.style.width = progress + '%';
+                }
+                if (progress < 100) {
+                    requestAnimationFrame(updateProgress);
+                }
+            }
+            
+            updateProgress();
+            
+            autoTimer = setTimeout(() => {
+                showAnswer();
+            }, timerDuration * 1000);
+        }
+
+        function showQuestion() {
+            if (problems.length === 0) return;
+            
+            const problem = problems[currentIndex];
+            const {dan, num} = problem;
+            
+            document.getElementById('question').textContent = `${dan} × ${num} = ?`;
+            document.getElementById('answer').textContent = dan * num;
+            document.getElementById('answer').classList.remove('show');
+            document.getElementById('hint').style.display = 'block';
+            
+            const progressText = mode === 'sequential' 
+                ? `${dan}단 - ${num}번 문제`
+                : `문제 ${currentIndex + 1} / ${problems.length}`;
+            document.getElementById('progress').textContent = progressText;
+            
+            const colors = [
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+                'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+                'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)'
+            ];
+            document.getElementById('flashcard').style.background = colors[dan - 2];
+            
+            if (timerDuration > 0) {
+                startAutoTimer();
+            }
+        }
+
+        function showAnswer() {
+            stopAllTimers();
+            document.getElementById('timerProgress').style.width = '100%';
+            document.getElementById('answer').classList.add('show');
+            document.getElementById('hint').style.display = 'none';
+        }
+
+        function prevQuestion() {
+            stopAllTimers();
+            currentIndex--;
+            if (currentIndex < 0) {
+                currentIndex = problems.length - 1;
+            }
+            showQuestion();
+        }
+
+        function nextQuestion() {
+            stopAllTimers();
+            currentIndex++;
+            if (currentIndex >= problems.length) {
+                currentIndex = 0;
+                if (mode === 'random') {
+                    generateProblems();
+                    return;
+                }
+            }
+            showQuestion();
+        }
+
+        function toggleSelectAll() {
+            allSelected = !allSelected;
+            
+            if (!allSelected) {
+                for (let i = 2; i <= 9; i++) {
+                    let checkbox = document.getElementById(`dan${i}`);
+                    if (checkbox) checkbox.checked = false;
+                }
+                document.getElementById('dan2').checked = true;
+            } else {
+                for (let i = 2; i <= 9; i++) {
+                    let checkbox = document.getElementById(`dan${i}`);
+                    if (checkbox) checkbox.checked = true;
+                }
+            }
+            
+            generateProblems();
+            updateResetButtons();
+        }
+
+        // 바구니 게임 함수들
+        function initBasketGame() {
+            const gameCanvas = document.getElementById('gameCanvas');
+            gameCanvas.addEventListener('mousemove', moveBasket);
+            gameCanvas.addEventListener('touchmove', moveBasketTouch);
+        }
+
+        function moveBasket(e) {
+            if (!basketGame.running || basketGame.paused) return;
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            basketGame.basketX = Math.max(40, Math.min(460, x));
+            document.getElementById('basket').style.left = basketGame.basketX - 40 + 'px';
+        }
+
+        function moveBasketTouch(e) {
+            e.preventDefault();
+            if (!basketGame.running || basketGame.paused) return;
+            const rect = e.target.getBoundingClientRect();
+            const x = e.touches[0].clientX - rect.left;
+            basketGame.basketX = Math.max(40, Math.min(460, x));
+            document.getElementById('basket').style.left = basketGame.basketX - 40 + 'px';
+        }
+
+        function startBasketGame() {
+            // 기존 버블 모두 제거
+            document.querySelectorAll('.bubble').forEach(b => b.remove());
+            
+            basketGame.running = true;
+            basketGame.paused = false;
+            basketGame.score = 0;
+            basketGame.correct = 0;
+            basketGame.lives = 3;
+            basketGame.bubbles = [];
+            
+            document.getElementById('gameQuestion').textContent = '준비!';
+            updateBasketStats();
+            
+            // 1초 후 첫 문제 시작
+            setTimeout(() => {
+                if (basketGame.running) {
+                    generateNewProblem();
+                    animateBasketGame();
+                }
+            }, 1000);
+        }
+
+        function pauseBasketGame() {
+            basketGame.paused = !basketGame.paused;
+        }
+
+        function stopBasketGame() {
+            basketGame.running = false;
+            if (basketGame.animationId) {
+                cancelAnimationFrame(basketGame.animationId);
+            }
+            // 모든 버블 제거
+            document.querySelectorAll('.bubble').forEach(b => b.remove());
+        }
+
+        function generateNewProblem() {
+            const dan = Math.floor(Math.random() * 8) + 2;
+            const num = Math.floor(Math.random() * 9) + 1;
+            basketGame.currentAnswer = dan * num;
+            document.getElementById('gameQuestion').textContent = `${dan} × ${num} = ?`;
+            
+            // 정답 버블과 오답 버블들 생성
+            const answers = [basketGame.currentAnswer];
+            while (answers.length < 4) {
+                const wrongAnswer = Math.floor(Math.random() * 81) + 1;
+                if (!answers.includes(wrongAnswer)) {
+                    answers.push(wrongAnswer);
+                }
+            }
+            
+            // 섞기
+            answers.sort(() => Math.random() - 0.5);
+            
+            // 버블 생성
+            answers.forEach((answer, index) => {
+                setTimeout(() => {
+                    if (basketGame.running) {
+                        createBubble(answer);
+                    }
+                }, index * 1000);
+            });
+        }
+
+        function createBubble(value) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = value;
+            bubble.style.left = Math.random() * 450 + 'px';
+            bubble.style.top = '-50px';
+            bubble.dataset.value = value;
+            bubble.dataset.speed = Math.random() * 2 + 1;
+            
+            document.getElementById('gameCanvas').appendChild(bubble);
+            basketGame.bubbles.push(bubble);
+        }
+
+        function animateBasketGame() {
+            if (!basketGame.running) return;
+            
+            if (!basketGame.paused) {
+                basketGame.bubbles.forEach(bubble => {
+                    if (!bubble.parentNode) return;
+                    
+                    const currentTop = parseFloat(bubble.style.top);
+                    const speed = parseFloat(bubble.dataset.speed);
+                    bubble.style.top = currentTop + speed + 'px';
+                    
+                    // 바구니와 충돌 체크
+                    if (currentTop > 330 && currentTop < 350) {
+                        const bubbleX = parseFloat(bubble.style.left) + 25;
+                        if (Math.abs(bubbleX - basketGame.basketX) < 50) {
+                            const value = parseInt(bubble.dataset.value);
+                            if (value === basketGame.currentAnswer) {
+                                basketGame.score += 10;
+                                basketGame.correct++;
+                                bubble.remove();
+                                basketGame.bubbles = basketGame.bubbles.filter(b => b !== bubble);
+                                
+                                // 새 문제
+                                setTimeout(() => {
+                                    if (basketGame.running) {
+                                        // 남은 버블들 제거
+                                        basketGame.bubbles.forEach(b => b.remove());
+                                        basketGame.bubbles = [];
+                                        generateNewProblem();
+                                    }
+                                }, 500);
+                            } else {
+                                basketGame.lives--;
+                                bubble.remove();
+                                basketGame.bubbles = basketGame.bubbles.filter(b => b !== bubble);
+                                
+                                if (basketGame.lives <= 0) {
+                                    alert(`게임 오버! 점수: ${basketGame.score}`);
+                                    stopBasketGame();
+                                    return;
+                                }
+                            }
+                            updateBasketStats();
+                        }
+                    }
+                    
+                    // 화면 밖으로 나간 버블 제거
+                    if (currentTop > 400) {
+                        const value = parseInt(bubble.dataset.value);
+                        // 정답 버블을 놓친 경우
+                        if (value === basketGame.currentAnswer) {
+                            basketGame.lives--;
+                            updateBasketStats();
+                            
+                            if (basketGame.lives <= 0) {
+                                alert(`게임 오버! 점수: ${basketGame.score}`);
+                                stopBasketGame();
+                                bubble.remove();
+                                basketGame.bubbles = basketGame.bubbles.filter(b => b !== bubble);
+                                return;
+                            }
+                            
+                            // 새 문제 생성
+                            setTimeout(() => {
+                                if (basketGame.running) {
+                                    // 남은 버블들 제거
+                                    basketGame.bubbles.forEach(b => b.remove());
+                                    basketGame.bubbles = [];
+                                    generateNewProblem();
+                                }
+                            }, 500);
+                        }
+                        
+                        bubble.remove();
+                        basketGame.bubbles = basketGame.bubbles.filter(b => b !== bubble);
+                    }
+                });
+            }
+            
+            basketGame.animationId = requestAnimationFrame(animateBasketGame);
+        }
+
+        function updateBasketStats() {
+            document.getElementById('score').textContent = basketGame.score;
+            document.getElementById('correct').textContent = basketGame.correct;
+            document.getElementById('lives').textContent = '❤️'.repeat(basketGame.lives);
+        }
+
+        // 키보드 단축키
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('flashcardGame').style.display !== 'none') {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    const answer = document.getElementById('answer');
+                    if (!answer.classList.contains('show')) {
+                        showAnswer();
+                    } else {
+                        nextQuestion();
+                    }
+                } else if (e.key === 'ArrowRight') {
+                    nextQuestion();
+                } else if (e.key === 'ArrowLeft') {
+                    prevQuestion();
+                } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    showAnswer();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
